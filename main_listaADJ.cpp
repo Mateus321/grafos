@@ -6,8 +6,8 @@ int main (int argc, char **argv)
 {
     ifstream in ("dfs_input.txt");
     Grafo *grafo = new Grafo (in);
-    grafo->imprime ();  
+    //grafo->imprime ();  
     
-    grafo->buscaLargura();
+    grafo->prim(0);
     
 }

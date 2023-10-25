@@ -21,6 +21,9 @@ using namespace std;
 	    int _peso () { return this->peso; }
 	    int _v1 () { return this->v1; }
 	    int _v2 () { return this->v2; }
+      bool operator<(const Aresta &p) const{
+        return peso<p.peso;
+      }
 	    ~Aresta(){}
 	  };
 	private:	
@@ -64,6 +67,7 @@ using namespace std;
 	  Aresta *proxAdj (int v);
 	  Aresta *retiraAresta (int v1, int v2);
 	  void imprime () const ;
+    void prim(int raiz);
 	  int _numVertices () const;
 	  Grafo *grafoTransposto ();
     void buscaProfundidade();
@@ -74,7 +78,10 @@ using namespace std;
     void buscaLargura();
     void visitaBfs(int u, int *cor, int *dist, int *antecessor);
     ~Grafo ();
-    void caminhocurto(int u, int v); 
+    void caminhocurto(int u, int v);
+    void kruskal(); 
+    int encontrarConjunto(int *conjunto, int a);
+    void unirconjunto(int *conjunto, int x, int y);
 	};
 
   Grafo::Grafo( istream &in )
@@ -165,6 +172,61 @@ using namespace std;
         }
       }//
     return grafoT;
+  }
+
+  void Grafo::prim(int raiz){
+    int n = this->_numVertices();
+    int *antecessor = new int[n];
+    double *peso = new double[n];
+    int *vs = new int[n];
+    bool *itensHeap = new bool[n];
+
+    for (int i = 0; i < n; i++)
+    {
+      peso[i] = 99999999;
+      antecessor[i] = -1;
+      itensHeap[i] = true;
+      vs[i++] = i;
+    }
+      
+    peso[raiz] = 0;
+
+    FPHeapMinIndireto Q(peso, vs, n);
+    Q.constroi();
+    int i = 0;
+
+    while (!Q.vazio())
+    {
+    
+    int u = Q.retiraMin();
+    itensHeap[u] = false;
+      if (!this->listaAdjVazia (u)) {
+        Aresta *adj = this->primeiroListaAdj (u);
+        while (adj != NULL) {
+          int v = adj->_v2();
+          int pesoA = adj->_peso();
+
+          if(itensHeap[v] && pesoA < peso[v]){
+            antecessor[v] = u;
+            Q.diminuiChave(v, pesoA);
+          }
+          
+          
+          delete adj;
+          adj = this->proxAdj (u);
+        }
+      }
+
+    int pesoT = 0;
+    for (int i = 0; i < n; i++)
+    {
+      cout << i << " : ";
+      cout << antecessor[i] << "(" << peso[i] << ")" << endl;
+      pesoT += peso[i];
+    }
+      
+    }
+    
   }
 
 
@@ -261,5 +323,61 @@ using namespace std;
 
   }
 
+  void Grafo::kruskal(){
+    vector<Aresta> S;
+    int *conjunto = new int[this->_numVertices()];
+
+    memset(conjunto, -1, sizeof(int)*this->_numVertices());
+
+    vector<Aresta> A;
+
+    for (int v = 0; v < this->numVertices; v++){
+      if (!this->listaAdjVazia (v)) {
+        Aresta *adj = this->primeiroListaAdj (v);
+        while (adj != NULL) {
+          A.push_back(*adj);
+          delete adj;
+          adj = this->proxAdj (v);
+        }
+      }
+    }
+    
+
+    sort(A.begin(), A.end());
+
+    for (int i = 0; i <= numVertices; i++)
+    {
+      if (encontrarConjunto(conjunto, A[i]._v1()) != encontrarConjunto(conjunto, A[i]._v2()))
+      {
+        S.push_back(A[i]);
+        
+        unirconjunto(conjunto, A[i]._v1(), A[i]._v2());
+      }
+    }
+    for (int i = 0; i < S.size(); i++)
+    {
+      cout<< S[i]._v1()<< " " << S[i]._v2() << " " << S[i]._peso() <<endl;
+    }
+    
+      
+  
+  }
+
+
+  int Grafo::encontrarConjunto(int *conjunto, int a){
+    if (conjunto[a] == -1)
+    {
+      return a;
+    }
+    return encontrarConjunto(conjunto, conjunto[a]);
+  }
+
+
+  void Grafo::unirconjunto(int *conjunto, int x, int y){
+    int conjuntoX= encontrarConjunto(conjunto, x);
+    int conjuntoY = encontrarConjunto(conjunto, y);
+    conjunto[conjuntoX] = conjuntoY;
+
+  }
 
 		

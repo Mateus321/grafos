@@ -48,7 +48,10 @@ using namespace std;
     bool euleriano();
     bool subeuleriano();
     bool direcionado();
-    ~Grafo ();	  
+    ~Grafo ();	 
+    void buscaLargura();
+    void visitaBfs(int u, int *cor, int *dist, int *antecessor);
+    void caminhocurto(int u, int v);  
 	};
 
   Grafo::Grafo( istream &in )
@@ -261,6 +264,68 @@ using namespace std;
     delete [] this->pos;
   }
 
+
+void Grafo::buscaLargura(){
+    int *cor = new int[this->_numVertices()];
+    int *antecesor = new int[this->_numVertices()];
+    int *dist = new int[this->_numVertices()];
+    for (int i = 0; i < this->_numVertices();  i++)
+    {
+        cor[i]= 0;
+        antecesor[i] = -1;
+        dist[i] = 999;
+    }
+    for (int i = 0; i < this->numVertices; i++)
+    {
+      if(cor[i] == 0){
+        visitaBfs(i, cor, antecesor, dist);
+      }
+    }
+  }
+
+  void Grafo::visitaBfs(int u, int *cor, int *dist, int *antecessor){
+    queue <int> fila;
+    dist[u] = 0;
+    cor[u] = 0;
+    fila.push(u);
+    while (!fila.empty())
+    {
+      u= fila.front();
+      fila.pop();
+      Aresta *adj = this->primeiroListaAdj(u);
+      cout<< "visitou" << endl;
+      while (!this->listaAdjVazia(u))
+      {
+        while (adj != NULL)
+        {
+          int v = adj->_v2();
+          if(cor[v]==0){
+            antecessor[u] = 1;
+            dist[v]= dist[u]+1;
+            cor[v]= 1;
+            fila.push(v);
+          }
+          delete adj;
+          adj = this->proxAdj(u);
+        }
+        cor[u] = 2;
+      }
+    }      
+  }
+ 
+
+  void Grafo::caminhocurto(int u, int v){
+  int *antecessor = new int[this->_numVertices()];
+  if(u == v) cout << v << endl;
+  
+  if(antecessor[v] = -1) cout << "Não existe caminho de U para V" << endl;
+
+  else {
+    caminhocurto(u, antecessor[v]);
+    cout << "" << endl;
+  }
+
+  }
 
 
 		
