@@ -82,6 +82,7 @@ using namespace std;
     void kruskal(); 
     int encontrarConjunto(int *conjunto, int a);
     void unirconjunto(int *conjunto, int x, int y);
+    void dijkstra(int raiz);
 	};
 
   Grafo::Grafo( istream &in )
@@ -379,5 +380,52 @@ using namespace std;
     conjunto[conjuntoX] = conjuntoY;
 
   }
+
+void Grafo::dijkstra(int raiz){
+  int n = this->_numVertices();
+  int *antecessor = new int[n];
+  double *peso = new double[n];
+  int *vs = new int[n];
+  bool *heap = new bool[n];
+
+  for (int i = 0; i < n; i++)
+  {
+    peso[i] = 9999;
+    antecessor[i] = -1;
+    vs[i++] = i;
+  }
+
+  peso[raiz] = 0;
+
+  FPHeapMinIndireto Q(peso, vs, n);
+  Q.constroi();
+
+  while (!Q.vazio())
+  {
+    int u = Q.retiraMin();
+    heap[u] = false;
+    if (!this->listaAdjVazia (u)) {
+        Aresta *adj = this->primeiroListaAdj (u);
+        while (adj != NULL) {
+          int v = adj->_v2();
+          int pesoA = adj->_peso();
+
+          if(heap[v] && pesoA < peso[v]){
+            antecessor[v] = u;
+            Q.diminuiChave(v, pesoA);
+          }
+
+          delete adj;
+          adj = this->proxAdj (u);
+        }
+      }
+  }
+
+  for(int i = 0; i < n; i++){
+    cout << i << " : ";
+    cout << antecessor[i] << "(" << peso[i] << ")" << endl;
+  }
+
+}
 
 		

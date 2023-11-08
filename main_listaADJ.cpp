@@ -4,10 +4,10 @@ using namespace std;
 
 int main (int argc, char **argv) 
 {
-    ifstream in ("dfs_input.txt");
+    ifstream in ("exemplo5.txt");
     Grafo *grafo = new Grafo (in);
     //grafo->imprime ();  
     
-    grafo->prim(0);
+    grafo->dijkstra(0);
     
 }
